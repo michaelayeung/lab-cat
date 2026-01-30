@@ -1,0 +1,22 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  memory-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Test O(1) memory with /dev/urandom stream
+        run: |
+          # Stream random data for 60s; if memory is O(n), this will OOM
+          # GitHub Actions runners have ~7GB RAM; 60s of urandom >> 7GB
+          timeout 60 cat /dev/urandom | python cat.py > /dev/null
+          echo "Memory test passed - script maintained O(1) memory"
+
